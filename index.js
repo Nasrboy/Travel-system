@@ -1,5 +1,6 @@
 const path = require('path');
 const express  = require('express');
+const fortune = require('./lib/fortune');
 const app  = express();
 
 // set up handle bars engine
@@ -10,15 +11,23 @@ app.set('view engine', 'handlebars');
 //allow static files from public folder
 app.use(express.static(path.join(__dirname, 'public')));
 
+app.use(function(req, res, next){
+    res.locals.showTests = app.get('env') !== 'production' &&
+    req.query.test === '1';
+    next();
+    });
+
 // set up port
 app.set('port',process.env.PORT || 3000);
+
+
 
 app.get('/',(req,res)=>{
     res.render('home')
 });
 
 app.get('/about',(req,res)=>{
-    res.render('about')
+    res.render('about' , {fortune : fortune.getFortune()})
 });
 
 
